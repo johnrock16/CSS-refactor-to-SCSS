@@ -1,11 +1,11 @@
 const fs = require('fs');
 
 //insert the file path you want to change and the fle path to colors path
-const FILEPATH = './css/style.scss';
+const FILEPATH = './css/style.css';
 const COLORSPATH = './css/colors.scss'
 
 let newFIlePath = FILEPATH.split('/');
-newFIlePath[newFIlePath.length - 1] = `new_${newFIlePath[newFIlePath.length - 1]}`;
+newFIlePath[newFIlePath.length - 1] = `new_${newFIlePath[newFIlePath.length - 1].replace('css','scss')}`;
 newFIlePath = newFIlePath.join('/');
 
 
@@ -132,7 +132,7 @@ const RULES = {
     }
 }
 
-const orders = ["position","top","left","bottom", "right","display","width","max-width","height","max-height","padding","margin","margin-top","margin-left","margin-bottom","margin-right","gap","font-size","color","background-color","border"]
+const orders = ["position","top","left","bottom", "right","display","flex-direction","justify-content","align-items","width","height","max-width","max-height","padding","padding-top","padding-left","padding-bottom","padding-right","margin","margin-top","margin-left","margin-bottom","margin-right","gap","font-size","color","text-align","letter-spacing","text-transform","white-space","text-shadow","background","background-color","border","border-top","border-left","border-bottom","border-right","border-radius","opacity","z-index"]
 
 const searchIndexAttribute = (line, regex) => {
     const index = line.search(regex)
@@ -140,7 +140,7 @@ const searchIndexAttribute = (line, regex) => {
 }
 
 const findBranch = (selectorObj, selector) => {
-    var hasSelectorParent = false
+    let hasSelectorParent = false
     Object.keys(selectorObj).forEach((selectorKey, index) => {
         if(selector.indexOf(selectorKey) > -1) {
             hasSelectorParent = true
@@ -214,7 +214,7 @@ fs.readFile(FILEPATH, 'utf8', async (err, data) => {
         });
 
         if(lines[i].indexOf('{') > -1) {
-            var selector = lines[i].replace('{', '').trim()
+            let selector = lines[i].replace('{', '').trim();
 
             if(selectors.indexOf(lines[i]) === -1){
                 selectors.push(selector)
@@ -224,13 +224,13 @@ fs.readFile(FILEPATH, 'utf8', async (err, data) => {
                 Object.keys(selectorObj).forEach((selectorKey, index) => {
                     if (selector.indexOf(selectorKey) > -1) {
 
-                        var hasAdded = false;
+                        let hasAdded = false;
 
                         if(Object.keys(selectorObj[selectorKey]).length > 0) {
                             var hasSelectorParent = findBranch(selectorObj[selectorKey], selector)
                             if(!hasSelectorParent && selector.indexOf('__') > -1) {
                                 if(selector.indexOf('>') > -1){
-                                    var key = selector.split('__')[1].split('>')[0].trim();
+                                    let key = selector.split('__')[1].split('>')[0].trim();
                                     selectorObj[selectorKey][`&__${key}`][selector.split('__')[1].split('>')[1]] = {}
                                     hasAdded = true
                                     storeKey = []
@@ -240,9 +240,9 @@ fs.readFile(FILEPATH, 'utf8', async (err, data) => {
                                 }
                                 else if(selector.indexOf(':') > -1) {
                                     // console.log(selector)
-                                    var key = selector.split('__')[1].split(':')[0];
-                                    var countDots = selector.split(':').length -1;
-                                    var key2 = selector.split('__')[1].split(':')[countDots];
+                                    let key = selector.split('__')[1].split(':')[0];
+                                    let countDots = selector.split(':').length -1;
+                                    let key2 = selector.split('__')[1].split(':')[countDots];
                                     // console.log()
                                     selectorObj[selectorKey][`&__${key}`]['&'+':'.repeat(countDots)+key2]= {}
                                     hasAdded = true
@@ -252,7 +252,7 @@ fs.readFile(FILEPATH, 'utf8', async (err, data) => {
                                     storeKey.push('&'+':'.repeat(countDots)+key2)
                                 }
                                 else if(selector.indexOf(' ') > -1) {
-                                    var key = selector.split('__')[1].split(' ')[0]
+                                    let key = selector.split('__')[1].split(' ')[0]
                                     selectorObj[selectorKey][`&__${key}`][selector.split('__')[1].split(' ')[1]] = {}
                                     hasAdded = true
                                     storeKey = []
@@ -261,7 +261,7 @@ fs.readFile(FILEPATH, 'utf8', async (err, data) => {
                                     storeKey.push(selector.split('__')[1].split(' ')[1])
                                 }
                                 else if(selector.indexOf('--') > -1 ){
-                                    var key = selector.split('__')[1].split('--')[0]
+                                    let key = selector.split('__')[1].split('--')[0]
                                     selectorObj[selectorKey][`&__${key}`][selector.split('__')[1].split('--')[1]] = {}
                                     hasAdded = true
                                     storeKey = []
@@ -270,7 +270,7 @@ fs.readFile(FILEPATH, 'utf8', async (err, data) => {
                                     storeKey.push('&--'+selector.split('__')[1].split('--')[1])
                                 }
                                 else if(selector.split('__').length > 2){
-                                    var key = selector.split('__')[1]
+                                    let key = selector.split('__')[1]
                                     selectorObj[selectorKey][`&__${key}`][`&__${selector.split('__')[2]}`] = {}
                                     hasAdded = true
                                     storeKey = []
@@ -283,7 +283,7 @@ fs.readFile(FILEPATH, 'utf8', async (err, data) => {
 
                         if(!hasAdded){
                             if(selector.indexOf('>') > -1){
-                                var key = selector.split('>')[0].trim();
+                                let key = selector.split('>')[0].trim();
                                 selectorObj[selectorKey][selector.split('>')[1]] = {}
                                 hasAdded = true
                                 storeKey = []
@@ -291,7 +291,7 @@ fs.readFile(FILEPATH, 'utf8', async (err, data) => {
                                 storeKey.push(`& >${selector.split('>')[1]}`)
                             }
                             else {
-                                var key = selector.indexOf(' ') > -1 ? selector.split(' ')[1] : selector.replace(selectorKey, '&')
+                                let key = selector.indexOf(' ') > -1 ? selector.split(' ')[1] : selector.replace(selectorKey, '&')
                                 selectorObj = {...selectorObj, [selectorKey] : {...selectorObj[selectorKey],[`${key}`]: {}} }
                                 storeKey = []
                                 storeKey.push(selectorKey)
@@ -301,7 +301,7 @@ fs.readFile(FILEPATH, 'utf8', async (err, data) => {
 
                     }
                     else {
-                        var hasSelectorParent = findBranch(selectorObj, selector)
+                        let hasSelectorParent = findBranch(selectorObj, selector)
                         if(!hasSelectorParent){
                             selectorObj = {...selectorObj, [`${selector}`]: {}}
                             storeKey = []
@@ -330,10 +330,10 @@ fs.readFile(FILEPATH, 'utf8', async (err, data) => {
         }
     }
 
-    var arrayPush = []
-    var objIndex = {}
+    let arrayPush = []
+    let objIndex = {}
 
-    var navigateIndex = function (obj, path = '') {
+    let navigateIndex = function (obj, path = '') {
         Object.keys(obj).forEach((key, index)=>{
             if(typeof obj[key] === "object") {
                 if(path !== '') {
@@ -344,35 +344,43 @@ fs.readFile(FILEPATH, 'utf8', async (err, data) => {
             }
         })
     }
-    var concatTab = function (times) {
-        var tab = ''
+    let concatTab = function (times) {
+        let tab = ''
         for(var i = 0; i < times; i++){
             tab += '\t';
         }
         return tab;
     }
 
-
     navigateIndex(selectorObj);
 
-    var sortAttributes = function (obj, children = false) {
-        var arrayAttributes = []
+    const sortAttributes = function (obj, children = false) {
+        let arrayAttributes = []
+        let arrayAttributesAfter = [];
+        let sortAfter = false;
         if(!children){
+
             Object.keys(obj).forEach((key, index2)=>{
                 arrayAttributes = []
                 // arrayAttributes2 = []
-                Object.keys(obj[key]).forEach((key2, index2) => {
-                    if(typeof obj[key][key2] !== "object"){
-                        arrayAttributes.push(key2)
-                    }
-                    else {
-                        console.log(key,key2)
-                    }
-                });
-                if(arrayAttributes && arrayAttributes.length > 1){
+                if(typeof obj[key] === 'object') {
+                    Object.keys(obj[key]).forEach((key2, index2) => {
+                        if(typeof obj[key][key2] !== "object"){
+                            arrayAttributes.push(key2)
+                        }
+                        else {
+                            obj[key][key2] = sortAttributes(obj[key][key2])
+                        }
+                    });
+                }
+                else {
+                    arrayAttributesAfter.push(key);
+                    sortAfter = true
+                }
+                if(!sortAfter && arrayAttributes && arrayAttributes.length > 1){
                     arrayAttributes.sort((a,b)=>{
-                        var first = (orders.indexOf(a.trim()) > -1) ? orders.indexOf(a.trim()) : 999
-                        var second = (orders.indexOf(b.trim()) > -1) ? orders.indexOf(b.trim()) : 999
+                        let first = (orders.indexOf(a.trim()) > -1) ? orders.indexOf(a.trim()) : 999
+                        let second = (orders.indexOf(b.trim()) > -1) ? orders.indexOf(b.trim()) : 999
                         if( first < second)
                             return -1;
                         return 1;
@@ -383,26 +391,39 @@ fs.readFile(FILEPATH, 'utf8', async (err, data) => {
                         obj[key][keyOrder] = objCopy[keyOrder]
                     })
                     obj[key] = {...obj[key],...objCopy}
-                    // console.log('aqui',key)
-                    // console.log('aqui', arrayAttributes)
+                    arrayAttributes = [];
                 }
             });
+            if(sortAfter && arrayAttributesAfter && arrayAttributesAfter.length > 1){
+                arrayAttributesAfter.sort((a,b)=>{
+                    let first = (orders.indexOf(a.trim()) > -1) ? orders.indexOf(a.trim()) : 999
+                    let second = (orders.indexOf(b.trim()) > -1) ? orders.indexOf(b.trim()) : 999
+                    if( first < second)
+                        return -1;
+                    return 1;
+                })
+                if (arrayAttributesAfter.length > 0) {
+                    const objCopy = {...obj}
+                    obj = {}
+                    arrayAttributesAfter.forEach((keyOrder) => {
+                        obj[keyOrder] = objCopy[keyOrder]
+                    })
+                    obj = {...obj, ...objCopy}
+                    arrayAttributesAfter = []
+                }
+            }
         }
-        else {
-
-        }
-        // console.log(obj)
         return obj
     }
 
     //order attributes
     selectorObj = sortAttributes(selectorObj);
 
-    var navigateObject = function (obj,path = '', times = 0, path2 = '') {
+    const navigateObject = function (obj,path = '', times = 0, path2 = '') {
         Object.keys(obj).forEach((key, index)=>{
-            var tabs = concatTab(times)
-            var currentPath = path + key
-            var currentPath2 = path2 +'/'+ key
+            let tabs = concatTab(times)
+            let currentPath = path + key
+            let currentPath2 = path2 +'/'+ key
             if(typeof obj[key] === "object") {
                 if(currentPath.indexOf('>') > -1 || currentPath.indexOf('--') > -1) {
                     arrayPush.pop();
@@ -421,8 +442,8 @@ fs.readFile(FILEPATH, 'utf8', async (err, data) => {
                 }
                 if(index + 1  == objIndex[path].count) {
                     arrayPush.push(`${tabs}}\n`)
-                    var split = currentPath2.split("/");
-                    var index = split.slice(0, split.length - 2).join("");
+                    let split = currentPath2.split("/");
+                    let index = split.slice(0, split.length - 2).join("");
                     if(objIndex[index] && objIndex[index].lastPath == currentPath2.split('/')[times]) {
                         tabs = concatTab(times -2)
                         arrayPush.push(`${tabs}}\n`)
