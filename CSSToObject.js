@@ -1,5 +1,77 @@
 const { RULES, manageRules } = require("./rules");
-const { findBranch } = require("./utils");
+const orders = RULES.orders;
+
+const findBranch = (selectorObj, selector) => {
+    let hasSelectorParent = false
+    Object.keys(selectorObj).forEach((selectorKey, index) => {
+        if(selector.indexOf(selectorKey) > -1) {
+            hasSelectorParent = true
+        }
+    });
+    return hasSelectorParent
+}
+
+const sortAttributes = function (obj, children = false) {
+    let arrayAttributes = []
+    let arrayAttributesAfter = [];
+    let sortAfter = false;
+    if(!children){
+
+        Object.keys(obj).forEach((key, index2)=>{
+            arrayAttributes = []
+            // arrayAttributes2 = []
+            if(typeof obj[key] === 'object') {
+                Object.keys(obj[key]).forEach((key2, index2) => {
+                    if(typeof obj[key][key2] !== "object"){
+                        arrayAttributes.push(key2)
+                    }
+                    else {
+                        obj[key][key2] = sortAttributes(obj[key][key2])
+                    }
+                });
+            }
+            else {
+                arrayAttributesAfter.push(key);
+                sortAfter = true
+            }
+            if(!sortAfter && arrayAttributes && arrayAttributes.length > 1){
+                arrayAttributes.sort((a,b)=>{
+                    let first = (orders.indexOf(a.trim()) > -1) ? orders.indexOf(a.trim()) : 999
+                    let second = (orders.indexOf(b.trim()) > -1) ? orders.indexOf(b.trim()) : 999
+                    if( first < second)
+                        return -1;
+                    return 1;
+                })
+                const objCopy = obj[key];
+                obj[key] = {};
+                arrayAttributes.forEach((keyOrder) => {
+                    obj[key][keyOrder] = objCopy[keyOrder]
+                })
+                obj[key] = {...obj[key],...objCopy}
+                arrayAttributes = [];
+            }
+        });
+        if(sortAfter && arrayAttributesAfter && arrayAttributesAfter.length > 1){
+            arrayAttributesAfter.sort((a,b)=>{
+                let first = (orders.indexOf(a.trim()) > -1) ? orders.indexOf(a.trim()) : 999
+                let second = (orders.indexOf(b.trim()) > -1) ? orders.indexOf(b.trim()) : 999
+                if( first < second)
+                    return -1;
+                return 1;
+            })
+            if (arrayAttributesAfter.length > 0) {
+                const objCopy = {...obj}
+                obj = {}
+                arrayAttributesAfter.forEach((keyOrder) => {
+                    obj[keyOrder] = objCopy[keyOrder]
+                })
+                obj = {...obj, ...objCopy}
+                arrayAttributesAfter = []
+            }
+        }
+    }
+    return obj
+}
 
 const CSSToObject = (lines, colorsFormated) => {
     let selectors = [];
@@ -120,4 +192,4 @@ const CSSToObject = (lines, colorsFormated) => {
     return selectorObj;
 }
 
-module.exports = {CSSToObject}
+module.exports = {CSSToObject, findBranch, sortAttributes}

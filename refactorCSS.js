@@ -1,7 +1,7 @@
 const fs = require('fs');
-const {sortAttributes, Navigate} = require('./utils');
+const Navigate = require('./navigate');
 const {generateColors} = require('./colors');
-const { CSSToObject } = require('./CSSToObject');
+const { CSSToObject, sortAttributes } = require('./CSSToObject');
 
 //insert the file path you want to change and the fle path to colors path
 const FILEPATH = './css/style.css';

@@ -122,6 +122,11 @@ const RULES = {
     orders: ["position","top","left","bottom", "right","display","flex-direction","justify-content","align-items","width","height","max-width","max-height","padding","padding-top","padding-left","padding-bottom","padding-right","margin","margin-top","margin-left","margin-bottom","margin-right","gap","font-size","color","text-align","letter-spacing","text-transform","white-space","text-shadow","background","background-color","border","border-top","border-left","border-bottom","border-right","border-radius","opacity","z-index"]
 }
 
+const searchIndexAttribute = (line, regex) => {
+    const index = line.search(regex)
+    return {index, regex}
+}
+
 const manageRules = (lines, attribute, i, colorsFormated) => {
     if(lines[i].indexOf(attribute) > -1 && lines[i].search(/[//]/) == -1) {
         switch(RULES.attributes[attribute].method) {
