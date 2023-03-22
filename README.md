@@ -10,3 +10,12 @@ after that
 ---
     node refactorCSS.js
 ---
+
+## How this works
+The code will read a CSS file and translate to a scss file, some changes will be made like the new scss file will be written using nesting, the colors variables will be replaced by variables if the color will finded on colors.scss, font-sizes will be replaced by a mixin fontSize, atrributes will be sort by RULES.orders this will become your attributes had a standard order by, your padding/margin/gap attributes in a range of 8/16/24/32/40 will be replaced by gutter spacing. Any of this "Rules" can be changed in Rules.js.
+
+
+CSS file in left and in right the new SCSS file:
+
+![A CSS FIle without using nesting, without vars and quite unorganized](./readMe/style.jpg)
+![A SCSS using nesting, with colors and gutter vars, mixins for fontsize etc.](./readMe/scss.jpg)
